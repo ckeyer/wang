@@ -34,7 +34,7 @@ func writeVer(name string, ver semver.Version) error {
 	}
 	defer f.Close()
 
-	_, err = f.WriteString(ver.String())
+	_, err = f.WriteString(ver.String() + "\n")
 	if err != nil {
 		return err
 	}

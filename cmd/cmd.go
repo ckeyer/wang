@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/Masterminds/semver"
-
 	"github.com/ckeyer/logrus"
 	"github.com/spf13/cobra"
 )
@@ -13,11 +13,11 @@ const (
 	KeyMajor = "major"
 	KeyMinor = "minor"
 	KeyPatch = "patch"
-
-	defaultVerFile = "VERSION"
 )
 
 var (
+	defaultVerFile = []string{"VERSION", "VERSION.txt"}
+
 	debug    bool
 	verFile  string
 	confFile string
@@ -73,7 +73,14 @@ func incCmd(k string, fc func(semver.Version) semver.Version) *cobra.Command {
 			if len(args) > 0 {
 				verFile = args[0]
 			} else {
-				verFile = defaultVerFile
+				for _, fname := range defaultVerFile {
+					if _, err := os.Open(fname); err == nil {
+						verFile = fname
+					}
+				}
+				if verFile == "" {
+					logrus.Fatal("not found a version file.")
+				}
 			}
 
 			v, err := readVer(verFile)
@@ -89,7 +96,7 @@ func incCmd(k string, fc func(semver.Version) semver.Version) *cobra.Command {
 				logrus.Errorf("write version file %s failed, %s", verFile, err)
 				return
 			}
-			logrus.WithField("old", v.String()).WithField("new", next.String()).Info("inc %s successful.", k)
+			logrus.WithField("old", v.String()).WithField("new", next.String()).Infof("inc %s successful.", k)
 		},
 	}
 	return cmd
