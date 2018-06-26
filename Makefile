@@ -31,8 +31,8 @@ patch:
 
 tag:
 	git tag -f v$(VERSION)
-	git push origin v$(VERSION)
-	hub release create -m "v$(VERSION)" v$(VERSION)
+	-git push origin v$(VERSION)
+	-hub release create -m "v$(VERSION)" v$(VERSION)
 
 release: clean tag build
 	mkdir -p bundles/$(PACKAGE_NAME)
@@ -41,7 +41,7 @@ release: clean tag build
 	 echo $(VERSION) > $(PACKAGE_NAME)/release.txt ;\
 	 $(HASH) $(PACKAGE_NAME)/$(APP) > $(PACKAGE_NAME)/sha1.txt ;\
 	 tar zcvf $(PACKAGE_NAME).tar.gz $(PACKAGE_NAME);
-	hub release edit -a bundles/$(PACKAGE_NAME).tar.gz v${VERSION}
+	hub release edit -m "v$(VERSION)" -a bundles/$(PACKAGE_NAME).tar.gz v${VERSION}
 
 clean:
 	rm -rf bundles/*
